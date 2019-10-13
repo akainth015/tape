@@ -9,9 +9,33 @@
 plugins {
     // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
     `java-gradle-plugin`
+    id("com.gradle.plugin-publish") version "0.10.1"
 
     // Apply the Kotlin JVM plugin to add support for Kotlin.
     id("org.jetbrains.kotlin.jvm") version "1.3.41"
+}
+
+gradlePlugin {
+    // Define the plugin
+    plugins {
+        create("tape") {
+            id = "me.akainth.tape"
+            implementationClass = "me.akainth.tape.TapePlugin"
+        }
+    }
+}
+
+pluginBundle {
+    website = "https://akainth.me"
+    vcsUrl = "https://github.com/akainth015/tape"
+
+    description = "A type-safe units generator"
+    (plugins) {
+        "tape" {
+            displayName = "Tape"
+            tags = listOf("tape", "units", "dimension", "kotlin")
+        }
+    }
 }
 
 repositories {
@@ -41,14 +65,6 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }
 
-gradlePlugin {
-    // Define the plugin
-    @Suppress("UNUSED_VARIABLE") val tape by plugins.creating {
-        id = "me.akainth.tape"
-        implementationClass = "me.akainth.tape.TapePlugin"
-    }
-}
-
 // Add a source set for the functional test suite
 val functionalTestSourceSet = sourceSets.create("functionalTest") {}
 
@@ -65,3 +81,6 @@ val check by tasks.getting(Task::class) {
     // Run the functional tests as part of `check`
     dependsOn(functionalTest)
 }
+
+group = "me.akainth"
+version = "1.0-SNAPSHOT"
