@@ -3,51 +3,26 @@
  *
  * This generated file contains a sample Gradle plugin project to get you started.
  * For more details take a look at the Writing Custom Plugins chapter in the Gradle
- * User Manual available at https://docs.gradle.org/5.6.2/userguide/custom_plugins.html
+ * User Manual available at https://docs.gradle.org/6.7.1/userguide/custom_plugins.html
  */
 
 plugins {
     // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
     `java-gradle-plugin`
-    id("com.gradle.plugin-publish") version "0.10.1"
 
     // Apply the Kotlin JVM plugin to add support for Kotlin.
-    id("org.jetbrains.kotlin.jvm") version "1.3.41"
-}
-
-gradlePlugin {
-    // Define the plugin
-    plugins {
-        create("tape") {
-            id = "me.akainth.tape"
-            implementationClass = "me.akainth.tape.TapePlugin"
-        }
-    }
-}
-
-pluginBundle {
-    website = "https://akainth.me"
-    vcsUrl = "https://github.com/akainth015/tape"
-
-    description = "A type-safe units generator"
-    (plugins) {
-        "tape" {
-            displayName = "Tape"
-            tags = listOf("tape", "units", "dimension", "kotlin")
-        }
-    }
+    id("org.jetbrains.kotlin.jvm") version "1.3.72"
 }
 
 repositories {
-    // Use jcenter for resolving dependencies.
-    // You can declare any Maven/Ivy/file repository here.
+    // Use JCenter for resolving dependencies.
     jcenter()
     maven("https://jitpack.io")
 }
 
 dependencies {
     // Used to generate the Kotlin classes
-    compile("com.squareup:kotlinpoet:1.4.0")
+    implementation("com.squareup:kotlinpoet:1.4.0")
 
     // Used to make the class generation readable
     implementation("nl.devhaan:KotlinPoetDSL:v0.1.1")
@@ -65,22 +40,28 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 }
 
+gradlePlugin {
+    // Define the plugin
+    val tape by plugins.creating {
+        id = "me.akainth.tape"
+        implementationClass = "me.akainth.tape.TapePlugin"
+    }
+}
+
 // Add a source set for the functional test suite
-val functionalTestSourceSet = sourceSets.create("functionalTest") {}
+val functionalTestSourceSet = sourceSets.create("functionalTest") {
+}
 
 gradlePlugin.testSourceSets(functionalTestSourceSet)
-configurations.getByName("functionalTestImplementation").extendsFrom(configurations.getByName("testImplementation"))
+configurations["functionalTestImplementation"].extendsFrom(configurations["testImplementation"])
 
 // Add a task to run the functional tests
-val functionalTest by tasks.creating(Test::class) {
+val functionalTest by tasks.registering(Test::class) {
     testClassesDirs = functionalTestSourceSet.output.classesDirs
     classpath = functionalTestSourceSet.runtimeClasspath
 }
 
-val check by tasks.getting(Task::class) {
+tasks.check {
     // Run the functional tests as part of `check`
     dependsOn(functionalTest)
 }
-
-group = "me.akainth"
-version = "1.0-SNAPSHOT"

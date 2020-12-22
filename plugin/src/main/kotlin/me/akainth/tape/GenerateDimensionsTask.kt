@@ -7,24 +7,16 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
 
-
-@Suppress("unused")
-open class TapeTask : DefaultTask() {
+open class GenerateDimensionsTask : DefaultTask() {
     @Input
     val dimensions = mutableListOf<Dimension>()
 
     @OutputDirectory
-    var targetDirectory: File = project.buildDir
+    var targetDirectory: File = project.buildDir.resolve("generated/")
 
     fun dimension(name: String, base: String, setUpUnits: Action<in Dimension>): Dimension {
         val dimension = Dimension(name, base)
         setUpUnits.execute(dimension)
-        dimensions += dimension
-        return dimension
-    }
-
-    fun dimension(name: String, quotientDimension: QuotientDimension): RatioDimension {
-        val dimension = RatioDimension(name, quotientDimension.top, quotientDimension.bottom)
         dimensions += dimension
         return dimension
     }
