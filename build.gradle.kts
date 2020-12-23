@@ -9,7 +9,7 @@
 plugins {
     // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
     `java-gradle-plugin`
-    id("com.gradle.plugin-publish") version "0.10.1"
+    id("com.gradle.plugin-publish") version "0.12.0"
 
     // Apply the Kotlin JVM plugin to add support for Kotlin.
     id("org.jetbrains.kotlin.jvm") version "1.3.41"
@@ -49,9 +49,6 @@ dependencies {
     // Used to generate the Kotlin classes
     compile("com.squareup:kotlinpoet:1.4.0")
 
-    // Used to make the class generation readable
-    implementation("nl.devhaan:KotlinPoetDSL:v0.1.1")
-
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
 
@@ -68,6 +65,7 @@ dependencies {
 // Add a source set for the functional test suite
 val functionalTestSourceSet = sourceSets.create("functionalTest") {}
 
+gradlePlugin.testSourceSets(sourceSets["test"])
 gradlePlugin.testSourceSets(functionalTestSourceSet)
 configurations.getByName("functionalTestImplementation").extendsFrom(configurations.getByName("testImplementation"))
 
@@ -83,4 +81,4 @@ val check by tasks.getting(Task::class) {
 }
 
 group = "me.akainth"
-version = "1.0-SNAPSHOT"
+version = "1.1.1-SNAPSHOT"

@@ -9,12 +9,15 @@ import java.io.File
 
 
 @Suppress("unused")
-open class TapeTask : DefaultTask() {
+open class GenerateDimensionsTask : DefaultTask() {
     @Input
-    val dimensions = mutableListOf<Dimension>()
+    val dimensions = arrayListOf<Dimension>()
+
+    @Input
+    var useExperimentalInline = true
 
     @OutputDirectory
-    var targetDirectory: File = project.buildDir
+    var targetDirectory: File = project.buildDir.resolve("generated/")
 
     fun dimension(name: String, base: String, setUpUnits: Action<in Dimension>): Dimension {
         val dimension = Dimension(name, base)
@@ -29,8 +32,14 @@ open class TapeTask : DefaultTask() {
         return dimension
     }
 
+    fun dimension(name: String, productDimension: ProductDimension): TimesDimension {
+        val dimension = TimesDimension(name, productDimension.first, productDimension.second)
+        dimensions += dimension
+        return dimension
+    }
+
     @TaskAction
     fun generateDimensions() {
-        dimensions.map { dimension -> dimension.generateFile() }.forEach { it.writeTo(targetDirectory) }
+        dimensions.map { dimension -> dimension.generateFile(useExperimentalInline) }.forEach { it.writeTo(targetDirectory) }
     }
 }

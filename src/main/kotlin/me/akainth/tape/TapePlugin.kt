@@ -10,6 +10,6 @@ class TapePlugin : Plugin<Project> {
     override fun apply(project: Project) {
         // Register a task
         project.pluginManager.apply("java")
-        project.tasks.register("tape", TapeTask::class.java)
+        project.tasks.register("tape", GenerateDimensionsTask::class.java)
     }
 }

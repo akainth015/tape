@@ -1,46 +1,48 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package me.akainth.tape
 
 import com.squareup.kotlinpoet.*
 import java.io.Serializable
 
 @Suppress("unused")
-open class Dimension(val name: String, val base: String, val inline: Boolean = true) : Serializable {
+open class Dimension(val name: String, val base: String) : Serializable {
     val units = mutableListOf<Unit>()
 
     fun yotta() {
-        unit("yotta$base", 10e24)
+        unit("yotta$base", 1e24)
     }
 
     fun zetta() {
-        unit("zetta$base", 10e21)
+        unit("zetta$base", 1e21)
     }
 
     fun exa() {
-        unit("E$base", 10e18)
+        unit("E$base", 1e18)
     }
 
     fun peta() {
-        unit("peta$base", 10e15)
+        unit("peta$base", 1e15)
     }
 
     fun tera() {
-        unit("T$base", 10e12)
+        unit("T$base", 1e12)
     }
 
     fun giga() {
-        unit("G$base", 10e9)
+        unit("G$base", 1e9)
     }
 
     fun mega() {
-        unit("mega$base", 10e6)
+        unit("mega$base", 1e6)
     }
 
     fun kilo() {
-        unit("k$base", 10e3)
+        unit("k$base", 1e3)
     }
 
     fun hecto() {
-        unit("h$base", 10e3)
+        unit("h$base", 1e3)
     }
 
     fun deca() {
@@ -48,44 +50,44 @@ open class Dimension(val name: String, val base: String, val inline: Boolean = t
     }
 
     fun deci() {
-        unit("d$base", 10e-1)
+        unit("d$base", 1e-1)
     }
 
     fun centi() {
-        unit("c$base", 10e-2)
+        unit("c$base", 1e-2)
     }
 
     fun milli() {
-        unit("m$base", 10e-3)
+        unit("m$base", 1e-3)
     }
 
     fun micro() {
-        unit("μ$base", 10e-6)
-        unit("micro$base", 10e-6)
+        unit("μ$base", 1e-6)
+        unit("micro$base", 1e-6)
     }
 
     fun nano() {
-        unit("n$base", 10e-9)
+        unit("n$base", 1e-9)
     }
 
     fun pico() {
-        unit("p$base", 10e-12)
+        unit("p$base", 1e-12)
     }
 
     fun femto() {
-        unit("f$base", 10e-15)
+        unit("f$base", 1e-15)
     }
 
     fun atto() {
-        unit("a$base", 10e-18)
+        unit("a$base", 1e-18)
     }
 
     fun zepto() {
-        unit("z$base", 10e-21)
+        unit("z$base", 1e-21)
     }
 
     fun yocto() {
-        unit("y$base", 10e-24)
+        unit("y$base", 1e-24)
     }
 
     fun unit(name: String, ratioToBase: Number) {
@@ -126,7 +128,9 @@ open class Dimension(val name: String, val base: String, val inline: Boolean = t
         yocto()
     }
 
-    open fun generateFile(): FileSpec {
+    fun getClassName() = ClassName("me.akainth.tape.dimensions", name)
+
+    open fun generateFile(useExperimentalInline: Boolean): FileSpec {
         val primaryConstructor = FunSpec.constructorBuilder()
                 .addParameter(base, DOUBLE)
                 .build()
@@ -134,7 +138,7 @@ open class Dimension(val name: String, val base: String, val inline: Boolean = t
                 .primaryConstructor(primaryConstructor)
                 .addProperty(PropertySpec.builder(base, DOUBLE).initializer(base).build())
 
-        if (inline) {
+        if (useExperimentalInline) {
             dimension.addModifiers(KModifier.INLINE)
         }
 
@@ -155,9 +159,27 @@ open class Dimension(val name: String, val base: String, val inline: Boolean = t
         }
         generateExtensions(file)
 
+        val plusFunc = FunSpec.builder("plus")
+            .addModifiers(KModifier.OPERATOR)
+            .receiver(getClassName())
+            .addParameter("other", getClassName())
+            .returns(getClassName())
+            .addCode("return $name($base + other.$base)")
+            .build()
+        val minusFunc = FunSpec.builder("minus")
+            .addModifiers(KModifier.OPERATOR)
+            .receiver(getClassName())
+            .addParameter("other", getClassName())
+            .returns(getClassName())
+            .addCode("return $name($base - other.$base)")
+            .build()
+        file.addFunction(plusFunc)
+        file.addFunction(minusFunc)
+
         return file.build()
     }
 
+    @Suppress("LeakingThis")
     private val baseUnit = Unit(base, 1.0, this)
 
     open fun generateExtensions(file: FileSpec.Builder) {}
@@ -166,6 +188,10 @@ open class Dimension(val name: String, val base: String, val inline: Boolean = t
 
     operator fun div(other: Dimension): QuotientDimension {
         return QuotientDimension(this, other)
+    }
+
+    fun multiply(other: Dimension): ProductDimension {
+        return ProductDimension(this, other)
     }
 
     operator fun times(other: Dimension): ProductDimension {
