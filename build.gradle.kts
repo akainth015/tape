@@ -12,7 +12,7 @@ plugins {
     id("com.gradle.plugin-publish") version "0.12.0"
 
     // Apply the Kotlin JVM plugin to add support for Kotlin.
-    id("org.jetbrains.kotlin.jvm") version "1.3.41"
+    id("org.jetbrains.kotlin.jvm") version "1.4.21"
 }
 
 gradlePlugin {
@@ -65,7 +65,6 @@ dependencies {
 // Add a source set for the functional test suite
 val functionalTestSourceSet = sourceSets.create("functionalTest") {}
 
-gradlePlugin.testSourceSets(sourceSets["test"])
 gradlePlugin.testSourceSets(functionalTestSourceSet)
 configurations.getByName("functionalTestImplementation").extendsFrom(configurations.getByName("testImplementation"))
 
@@ -81,4 +80,4 @@ val check by tasks.getting(Task::class) {
 }
 
 group = "me.akainth"
-version = "1.1.1-SNAPSHOT"
+version = "1.1.2"

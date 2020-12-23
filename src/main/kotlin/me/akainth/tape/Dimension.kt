@@ -18,7 +18,7 @@ open class Dimension(val name: String, val base: String) : Serializable {
     }
 
     fun exa() {
-        unit("E$base", 1e18)
+        unit("exa$base", 1e18)
     }
 
     fun peta() {
@@ -26,11 +26,11 @@ open class Dimension(val name: String, val base: String) : Serializable {
     }
 
     fun tera() {
-        unit("T$base", 1e12)
+        unit("tera$base", 1e12)
     }
 
     fun giga() {
-        unit("G$base", 1e9)
+        unit("giga$base", 1e9)
     }
 
     fun mega() {
@@ -38,27 +38,27 @@ open class Dimension(val name: String, val base: String) : Serializable {
     }
 
     fun kilo() {
-        unit("k$base", 1e3)
+        unit("kilo$base", 1e3)
     }
 
     fun hecto() {
-        unit("h$base", 1e3)
+        unit("hecto$base", 1e3)
     }
 
     fun deca() {
-        unit("da$base", 10)
+        unit("deca$base", 10)
     }
 
     fun deci() {
-        unit("d$base", 1e-1)
+        unit("deci$base", 1e-1)
     }
 
     fun centi() {
-        unit("c$base", 1e-2)
+        unit("centi$base", 1e-2)
     }
 
     fun milli() {
-        unit("m$base", 1e-3)
+        unit("milli$base", 1e-3)
     }
 
     fun micro() {
@@ -67,27 +67,27 @@ open class Dimension(val name: String, val base: String) : Serializable {
     }
 
     fun nano() {
-        unit("n$base", 1e-9)
+        unit("nano$base", 1e-9)
     }
 
     fun pico() {
-        unit("p$base", 1e-12)
+        unit("pico$base", 1e-12)
     }
 
     fun femto() {
-        unit("f$base", 1e-15)
+        unit("femto$base", 1e-15)
     }
 
     fun atto() {
-        unit("a$base", 1e-18)
+        unit("atto$base", 1e-18)
     }
 
     fun zepto() {
-        unit("z$base", 1e-21)
+        unit("zepto$base", 1e-21)
     }
 
     fun yocto() {
-        unit("y$base", 1e-24)
+        unit("yocto$base", 1e-24)
     }
 
     fun unit(name: String, ratioToBase: Number) {
