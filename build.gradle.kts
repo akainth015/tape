@@ -47,7 +47,7 @@ repositories {
 
 dependencies {
     // Used to generate the Kotlin classes
-    compile("com.squareup:kotlinpoet:1.4.0")
+    compile("com.squareup:kotlinpoet:1.7.2")
 
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
@@ -80,4 +80,4 @@ val check by tasks.getting(Task::class) {
 }
 
 group = "me.akainth"
-version = "1.1.2"
+version = "1.2.0"
