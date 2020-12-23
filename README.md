@@ -14,6 +14,7 @@ plugins {
 Tape will generate extensions that need to be added to your source sets
 
 ~~~kotlin
+tasks["compileKotlin"].dependsOn(tasks["tape"])
 sourceSets["main"].java.srcDir(tasks.getByName("tape", GenerateDimensionsTask::class).targetDirectory)
 ~~~
 
