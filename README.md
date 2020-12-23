@@ -1,7 +1,7 @@
 # tape
 
 Tape is a Gradle plugin that generates units so that your code's safety can be evaluated by the compiler and Java /
-Kotlin's type system.
+Kotlin's type system. It aims to provide a simple, and minimal interface for this task. If more extensive support and generation is required, it is recommended that you take a look at [kunalsheth/units-of-measure](https://github.com/kunalsheth/units-of-measure) instead.
 
 To add the plugin to a project, add it to the `plugins` block
 
