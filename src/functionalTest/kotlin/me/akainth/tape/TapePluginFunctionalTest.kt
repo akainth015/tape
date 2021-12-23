@@ -1,86 +1,125 @@
 package me.akainth.tape
 
 import org.gradle.testkit.runner.GradleRunner
-import java.io.File
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 import kotlin.test.Test
 
 class TapePluginFunctionalTest {
+    @get:Rule
+    val projectDirectory = TemporaryFolder()
+
     @Test
-    fun `can run task`() {
-        // Setup the test build
-        val projectDir = File("build/functionalTest")
-        projectDir.mkdirs()
-        projectDir.resolve("settings.gradle").writeText("")
-        projectDir.resolve("build.gradle")
-            .writeText(
-                """
-        plugins {
-            id("me.akainth.tape")
-            id "application"
+    fun `generates default dimensions`() {
+        // Set up the test build
+        projectDirectory.newFile("settings.gradle.kts").createNewFile()
+        projectDirectory.newFile("build.gradle.kts")
+            .writeText("""
+                plugins {
+                    id("me.akainth.tape")
+                    application
+                    kotlin("jvm") version "1.6.10" 
+                }
+                
+                repositories {
+                    mavenCentral()
+                }
+                
+                application {
+                    mainClass.set("MainKt")
+                }
+                
+                tape {
+                    length
+                    time
+                    speed
+                }
+                
+                tasks["compileKotlin"].dependsOn(tasks["tape"])
+                sourceSets["main"].java.srcDir(tape.targetDirectory.map {it.asFile}.get())
+            """.trimIndent())
 
-            id "org.jetbrains.kotlin.jvm" version "1.4.21"
-        }
-
-        repositories {
-            jcenter()
-        }
-
-        dependencies {
-            implementation(group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: '1.4.21')
-        }
-
-        sourceSets.main.kotlin.srcDirs += tape.targetDirectory
-
-        tape {
-            def length = dimension("Length", "meters") {
-                unit("feet", 0.3048)
-                unit("inches", 0.0254)
-                addMetricUnits()
-            }
-            def time = dimension("Time", "seconds") {
-                milli()
-                nano()
-            }
-            def mass = dimension("Mass", "grams") {
-                addMetricUnits()
-            }
-            def speed = dimension("Speed", length / time)
-            def acceleration = dimension("Acceleration", speed / time)
-            dimension("Force", acceleration * mass)
-            dimension("Area", length * length)
-        }
-
-        application {
-            mainClassName = "MainKt"
-        }
-
-        compileKotlin.dependsOn(tape)
-        """.trimIndent()
-            )
-        projectDir.resolve("src/main/kotlin/main.kt")
-            .writeText(
-                """
-            import me.akainth.tape.dimensions.feet
-            import me.akainth.tape.dimensions.seconds
+        val srcFolder = projectDirectory.newFolder("src", "main", "kotlin")
+        srcFolder.resolve("main.kt").writeText("""
+            import me.akainth.tape.dimensions.ft
+            import me.akainth.tape.dimensions.s
             import me.akainth.tape.dimensions.div
-            import me.akainth.tape.dimensions.feetPerSeconds
+            import me.akainth.tape.dimensions.ftPerS
+            import me.akainth.tape.dimensions.Distance
             
             fun main() {
-                val x = 1.feet
-                val t = 10.seconds
+                val x = 1.ft
+                val t = 10.s
                 val speed = x / t
-                println("speed = ${'$'}speed")
-                println("fps = ${'$'}{speed.feetPerSeconds}")
+                assert(speed == 0.1.ftPerS)
+                println("SUCCESS")
             }
-        """.trimIndent()
-            )
+        """.trimIndent())
+
 
         // Run the build
         val runner = GradleRunner.create()
         runner.forwardOutput()
         runner.withPluginClasspath()
         runner.withArguments("run")
-        runner.withProjectDir(projectDir)
-        runner.build()
+        runner.withProjectDir(projectDirectory.root)
+        val result = runner.build()
+
+        assert(result.output.contains("SUCCESS"))
+    }
+
+    @Test
+    fun `generates dimension aliases`() {
+        // Set up the test build
+        projectDirectory.newFile("settings.gradle.kts").createNewFile()
+        projectDirectory.newFile("build.gradle.kts")
+            .writeText("""
+                plugins {
+                    id("me.akainth.tape")
+                    application
+                    kotlin("jvm") version "1.6.10" 
+                }
+                
+                repositories {
+                    mavenCentral()
+                }
+                
+                application {
+                    mainClass.set("MainKt")
+                }
+                
+                tape {
+                    length
+                }
+                
+                tasks["compileKotlin"].dependsOn(tasks["tape"])
+                sourceSets["main"].java.srcDir(tape.targetDirectory.map {it.asFile}.get())
+            """.trimIndent())
+
+        val srcFolder = projectDirectory.newFolder("src", "main", "kotlin")
+        srcFolder.resolve("main.kt").writeText("""
+            import me.akainth.tape.dimensions.ft
+            import me.akainth.tape.dimensions.Distance
+            import me.akainth.tape.dimensions.Length
+            import me.akainth.tape.dimensions.minus
+            
+            fun main() {
+                val target: Distance = 10.ft
+                val delta: Length = 10.ft
+                assert(target - delta == 0.ft)
+                println("SUCCESS")
+            }
+        """.trimIndent())
+
+
+        // Run the build
+        val runner = GradleRunner.create()
+        runner.forwardOutput()
+        runner.withPluginClasspath()
+        runner.withArguments("run")
+        runner.withProjectDir(projectDirectory.root)
+        val result = runner.build()
+
+        assert(result.output.contains("SUCCESS"))
     }
 }

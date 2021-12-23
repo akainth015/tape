@@ -1,65 +1,75 @@
 package me.akainth.tape
 
 import org.gradle.api.Action
-import org.gradle.api.DefaultTask
+import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
-import java.io.File
-import kotlin.Unit
+import org.gradle.api.tasks.Internal
 
+abstract class TapeExtension(project: Project) {
+    @get:Input
+    abstract val dimensions: SetProperty<Dimension>
 
-@Suppress("unused")
-open class GenerateDimensionsTask : DefaultTask() {
-    @Input
-    val dimensions = arrayListOf<Dimension>()
+    @get:Input
+    abstract val targetDirectory: DirectoryProperty
 
-    @Input
-    var useExperimentalInline = true
-
-    @OutputDirectory
-    var targetDirectory: File = project.buildDir.resolve("generated/")
+    init {
+        targetDirectory.convention(project.layout.buildDirectory.dir("generated"))
+    }
 
     fun dimension(name: String, base: String, setUpUnits: Action<in Dimension>): Dimension {
         val dimension = Dimension(name, base)
         setUpUnits.execute(dimension)
-        dimensions += dimension
+        dimensions.add(dimension)
         return dimension
     }
 
     fun dimension(name: String, quotientDimension: QuotientDimension): RatioDimension {
         val dimension = RatioDimension(name, quotientDimension.top, quotientDimension.bottom)
-        dimensions += dimension
+        dimensions.add(dimension)
         return dimension
     }
 
     fun dimension(name: String, productDimension: ProductDimension): TimesDimension {
         val dimension = TimesDimension(name, productDimension.first, productDimension.second)
-        dimensions += dimension
+        dimensions.add(dimension)
         return dimension
     }
 
-    val length
-        get(): Dimension = dimension("Length", "meters") {
+    @get:Internal
+    val length by lazy {
+        dimension("Length", "meters") {
             it.apply {
-                unit("feet", 0.3048)
-                unit("inches", 0.0254)
-                addMetricUnits()
+                baseUnit.singular = "meter"
+                alias("Distance")
+                unit("ft", 0.3048)
+                unit("inches", 0.0254).apply {
+                    singular = "inch"
+                }
+                centi()
+                milli()
+                kilo()
             }
         }
+    }
 
+    @get:Internal
     val time by lazy {
-        dimension("Time", "seconds") {
+        dimension("Time", "s") {
             it.apply {
-                unit("minutes", 60)
+                unit("minutes", 60).apply {
+                    singular = "minute"
+                }
                 milli()
                 nano()
             }
         }
     }
 
+    @get:Internal
     val mass by lazy {
-        dimension("Mass", "grams") {
+        dimension("Mass", "g") {
             it.apply {
                 unit("pounds", 453.5924)
                 it.kilo()
@@ -67,6 +77,7 @@ open class GenerateDimensionsTask : DefaultTask() {
         }
     }
 
+    @get:Internal
     val bytes by lazy {
         dimension("Bytes", "bytes") {
             it.apply {
@@ -78,29 +89,30 @@ open class GenerateDimensionsTask : DefaultTask() {
         }
     }
 
+    @get:Internal
     val area by lazy {
         dimension("Area", length * length)
     }
 
+    @get:Internal
     val volume by lazy {
         dimension("Volume", area * length)
     }
 
+    @get:Internal
     val speed by lazy {
         dimension("Speed", length / time)
     }
 
+    @get:Internal
     val acceleration by lazy {
         dimension("Acceleration", speed / time)
     }
 
+    @get:Internal
     val force by lazy {
-        dimension("Force", mass * acceleration)
-    }
-
-    @TaskAction
-    fun generateDimensions() {
-        dimensions.map { dimension -> dimension.generateFile(useExperimentalInline) }
-            .forEach { it.writeTo(targetDirectory) }
+        dimension("Force", mass * acceleration).apply {
+            unit("N", 1)
+        }
     }
 }

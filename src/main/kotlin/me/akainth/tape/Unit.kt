@@ -3,8 +3,10 @@ package me.akainth.tape
 import com.squareup.kotlinpoet.*
 import java.io.Serializable
 
-class Unit(val name: String, val ratioToBase: Double, val dimension: Dimension): Serializable {
-    fun generateExtension(): PropertySpec {
+class Unit(val name: String, val ratioToBase: Double): Serializable {
+    public var singular: String = name
+
+    fun generateExtension(dimension: Dimension): PropertySpec {
         val type = ClassName("me.akainth.tape.dimensions", dimension.name)
         val getter = FunSpec.getterBuilder()
                 .addCode("return ${dimension.name}(toDouble() / ${ratioToBase})")
@@ -15,7 +17,7 @@ class Unit(val name: String, val ratioToBase: Double, val dimension: Dimension):
                 .build()
     }
 
-    fun generateProperty(): PropertySpec {
+    fun generateProperty(dimension: Dimension): PropertySpec {
         val getter = FunSpec.getterBuilder()
                 .addCode("return `${dimension.base}` * $ratioToBase")
                 .build()
