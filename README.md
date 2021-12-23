@@ -7,29 +7,30 @@ To add the plugin to a project, add it to the `plugins` block
 
 ```kotlin
 plugins {
-    id("me.akainth.tape") version "1.2.0"
+    id("me.akainth.tape") version "2.0.0"
 }
 ```
 
-Tape will generate extensions that need to be added to your source sets
+Tape will generate extensions that need to be added to your source sets. This should go _after_ the `tape` block in your buildscript.
 
 ~~~kotlin
 tasks["compileKotlin"].dependsOn(tasks["tape"])
-sourceSets["main"].java.srcDir(tasks.getByName("tape", GenerateDimensionsTask::class).targetDirectory)
+sourceSets["main"].java.srcDir(tape.targetDirectory.map {it.asFile}.get())
 ~~~
 
 Tape will not generate anything out of the box, you must first select which dimensions to generate.
 
 ```kotlin
-tasks.getByName("tape", GenerateDimensionsTask::class) {
+tape {    
     length
     time
-    speed
-    acceleration
     mass
-    force
+    bytes
     area
     volume
+    speed
+    acceleration
+    force
 }
 ```
 
@@ -42,8 +43,7 @@ val current = dimension("Current", charge / time)
 
 To configure the output from tape, you can configure the following members of `GenerateDimensionsTask`
 ~~~kotlin
-tasks.getByName("tape", GenerateDimensionsTask::class) {
-    targetDirectory = buildDir // buildDir.resolve("generated/") by default
-    useExperimentalInline = false // true by default
+tape {
+    targetDirectory.set(project.layout.buildDirectory.dir("generated"))
 }
 ~~~
