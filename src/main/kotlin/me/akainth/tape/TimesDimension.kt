@@ -1,13 +1,15 @@
 package me.akainth.tape
 
 import com.squareup.kotlinpoet.*
+import java.util.*
 
-class TimesDimension(name: String, val a: Dimension, val b: Dimension) : Dimension(name, "${a.base}${b.base.capitalize()}") {
+class TimesDimension(name: String, val a: Dimension, val b: Dimension) : Dimension(name,
+    "${a.base}${b.base.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}") {
     init {
         a.units.forEach { aUnit ->
             unit("${aUnit.name}${b.base}", aUnit.ratioToBase)
             b.units.forEach { bUnit ->
-                unit("${aUnit.name}${bUnit.name.capitalize()}", aUnit.ratioToBase * bUnit.ratioToBase)
+                unit("${aUnit.name}${bUnit.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}", aUnit.ratioToBase * bUnit.ratioToBase)
             }
         }
         for (unit in b.units) {

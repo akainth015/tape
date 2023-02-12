@@ -1,34 +1,27 @@
 plugins {
-    // Apply the Java Gradle plugin development plugin to add support for developing Gradle plugins
-    `java-gradle-plugin`
-    id("com.gradle.plugin-publish") version "0.12.0"
+    id("com.gradle.plugin-publish") version "1.1.0"
 
     // Apply the Kotlin JVM plugin to add support for Kotlin.
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "1.8.10"
 
     idea
 }
 
+group = "me.akainth"
+version = "2.0.1"
+
 gradlePlugin {
+    website.set("https://github.com/akainth015/tape")
+    vcsUrl.set("https://github.com/akainth015/tape")
+
     // Define the plugin
     plugins {
         create("tape") {
             id = "me.akainth.tape"
-            version = "2.0.0"
             implementationClass = "me.akainth.tape.TapePlugin"
-        }
-    }
-}
-
-pluginBundle {
-    website = "https://akainth.me"
-    vcsUrl = "https://github.com/akainth015/tape"
-
-    description = "A type-safe units generator"
-    (plugins) {
-        "tape" {
             displayName = "Tape"
-            tags = listOf("tape", "units", "dimension", "kotlin")
+            description = "A type-safe units generator"
+            tags.set(listOf("tape", "units", "dimension", "kotlin"))
         }
     }
 }
@@ -40,10 +33,15 @@ repositories {
     maven("https://jitpack.io")
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 dependencies {
     // Used to generate the Kotlin classes
-    @Suppress("SpellCheckingInspection")
-    implementation("com.squareup:kotlinpoet:1.10.2")
+    implementation("com.squareup:kotlinpoet:1.12.0")
 
     // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
@@ -61,7 +59,7 @@ dependencies {
 // Add a source set for the functional test suite
 val functionalTest: SourceSet by sourceSets.creating {
     idea.module {
-        testSourceDirs.plusAssign(allJava.srcDirs)
+        testSources.from(allJava.srcDirs)
     }
 }
 gradlePlugin.testSourceSets(functionalTest)

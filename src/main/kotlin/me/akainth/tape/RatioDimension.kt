@@ -4,14 +4,16 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier.OPERATOR
 import com.squareup.kotlinpoet.TypeSpec
+import java.util.*
 
 class RatioDimension(name: String, val top: Dimension, val bottom: Dimension)
-    : Dimension(name, "${top.base}Per${bottom.base.capitalize()}") {
+    : Dimension(name,
+    "${top.base}Per${bottom.base.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}") {
     init {
         top.units.forEach { topUnit ->
-            unit("${topUnit.name}Per${bottom.base.capitalize()}", topUnit.ratioToBase)
+            unit("${topUnit.name}Per${bottom.base.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}", topUnit.ratioToBase)
             bottom.units.forEach { bottomUnit ->
-                unit("${topUnit.name}Per${bottomUnit.name.capitalize()}", topUnit.ratioToBase / bottomUnit.ratioToBase)
+                unit("${topUnit.name}Per${bottomUnit.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}", topUnit.ratioToBase / bottomUnit.ratioToBase)
             }
         }
     }
