@@ -9,7 +9,7 @@ class Unit(val name: String, val ratioToBase: Double): Serializable {
     fun generateExtension(dimension: Dimension): PropertySpec {
         val type = ClassName("me.akainth.tape.dimensions", dimension.name)
         val getter = FunSpec.getterBuilder()
-                .addCode("return ${dimension.name}(toDouble() / ${ratioToBase})")
+                .addCode("return ${dimension.name}(toDouble() * ${ratioToBase})")
                 .build()
         return PropertySpec.builder(name, type)
                 .receiver(NUMBER)
@@ -19,7 +19,7 @@ class Unit(val name: String, val ratioToBase: Double): Serializable {
 
     fun generateProperty(dimension: Dimension): PropertySpec {
         val getter = FunSpec.getterBuilder()
-                .addCode("return `${dimension.base}` * $ratioToBase")
+                .addCode("return `${dimension.base}` / $ratioToBase")
                 .build()
         return PropertySpec.builder(name, DOUBLE)
                 .getter(getter)

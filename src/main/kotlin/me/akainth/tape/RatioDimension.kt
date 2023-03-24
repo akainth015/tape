@@ -8,10 +8,10 @@ import java.util.*
 
 class RatioDimension(name: String, val top: Dimension, val bottom: Dimension)
     : Dimension(name,
-    "${top.base}Per${bottom.base.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}") {
+    "${top.base}Per${bottom.baseUnit.singular.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}") {
     init {
         top.units.forEach { topUnit ->
-            unit("${topUnit.name}Per${bottom.base.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}", topUnit.ratioToBase)
+            unit("${topUnit.name}Per${bottom.baseUnit.singular.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}", topUnit.ratioToBase)
             bottom.units.forEach { bottomUnit ->
                 unit("${topUnit.name}Per${bottomUnit.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }}", topUnit.ratioToBase / bottomUnit.ratioToBase)
             }

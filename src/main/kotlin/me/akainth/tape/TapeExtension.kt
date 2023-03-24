@@ -43,7 +43,7 @@ abstract class TapeExtension(project: Project) {
             it.apply {
                 baseUnit.singular = "meter"
                 alias("Distance")
-                unit("ft", 0.3048)
+                unit("feet", 0.3048)
                 unit("inches", 0.0254).apply {
                     singular = "inch"
                 }
@@ -56,8 +56,9 @@ abstract class TapeExtension(project: Project) {
 
     @get:Internal
     val time by lazy {
-        dimension("Time", "s") {
+        dimension("Time", "seconds") {
             it.apply {
+                baseUnit.singular = "second"
                 unit("minutes", 60).apply {
                     singular = "minute"
                 }
@@ -69,7 +70,7 @@ abstract class TapeExtension(project: Project) {
 
     @get:Internal
     val mass by lazy {
-        dimension("Mass", "g") {
+        dimension("Mass", "grams") {
             it.apply {
                 unit("pounds", 453.5924)
                 it.kilo()
