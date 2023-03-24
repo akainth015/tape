@@ -7,7 +7,7 @@ To add the plugin to a project, add it to the `plugins` block
 
 ```kotlin
 plugins {
-    id("me.akainth.tape") version "2.0.1"
+    id("me.akainth.tape") version "2.1.0"
 }
 ```
 

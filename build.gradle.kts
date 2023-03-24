@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "me.akainth"
-version = "2.0.1"
+version = "2.1.0"
 
 gradlePlugin {
     website.set("https://github.com/akainth015/tape")
