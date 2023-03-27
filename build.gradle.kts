@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "me.akainth"
-version = "2.1.0"
+version = "2.1.1"
 
 gradlePlugin {
     website.set("https://github.com/akainth015/tape")
@@ -35,7 +35,7 @@ repositories {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(8))
     }
 }
 
